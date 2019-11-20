@@ -4,33 +4,25 @@ import sys
 import threading as mt
 import time
 
-import numpy as np
+from count_ops import count_ops
 
 
-def count_ops(que: queue.Queue, job_duration: float, sleep_duration: float = 0.):
-    ops_count = 0
-    start_time = time.time()
-    while time.time() - start_time < job_duration:
-        a = np.random.rand(64, 64)
-        x = np.random.rand(64, 64)
-        b = np.random.rand(64, 64)
-        _ = np.matmul(a, x) + b
-        ops_count += 1
-        if not sleep_duration:
-            continue
-        time.sleep(sleep_duration)
+def count_ops_que(que: queue.Queue, job_duration: float, array_s: int = 64):
+    start_time = time.perf_counter()
+    ops_count = count_ops(
+        job_duration=job_duration, array_s=array_s)
+    que.put(ops_count)
+    finish_time = time.perf_counter()
     if "-q" not in sys.argv:
         print(
             "Finished with {}k operations, about {:.3f}k operations per second".format(
-                ops_count / 1000, (ops_count / 1000) / job_duration))
-    que.put(ops_count)
+                ops_count / 1000, (ops_count / 1000) / (finish_time - start_time)))
 
 
 def main():
-    start_time = time.time()
+    start_time = time.perf_counter()
     n_jobs = 6
     job_duration = 1.
-    sleep_duration = 0.
 
     threads_list = []
     que = queue.Queue()
@@ -38,11 +30,10 @@ def main():
     for _ in range(n_jobs):
         threads_list.append(
             mt.Thread(
-                target=count_ops,
+                target=count_ops_que,
                 kwargs={
                     "que": que,
-                    "job_duration": job_duration,
-                    "sleep_duration": sleep_duration}))
+                    "job_duration": job_duration}))
     for t in threads_list:
         t.start()
     for t in threads_list:
@@ -53,7 +44,7 @@ def main():
             ops_counts.append(que.get_nowait())
         except queue.Empty:
             break
-    finish_time = time.time()
+    finish_time = time.perf_counter()
     ops_count_total = sum(ops_counts)
     print(
         "Finished all jobs, totalling {}k operations, about {:.3f}k operations per second".format(

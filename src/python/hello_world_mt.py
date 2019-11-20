@@ -3,56 +3,45 @@ import sys
 import threading as mt
 import time
 
-import numpy as np
+from count_ops import count_ops
 
 
 class HelloWorldMT(mt.Thread):
-    def __init__(self, job_duration: float, sleep_duration: float = 0.):
+    def __init__(self, job_duration: float, array_s: int = 64):
         mt.Thread.__init__(self)
         self.job_duration = job_duration
-        self.sleep_duration = sleep_duration
+        self.array_s = array_s
         self.ops_count = 0
 
     def run(self):
-        start_time = time.time()
-        while time.time() - start_time < self.job_duration:
-            a = np.random.rand(64, 64)
-            x = np.random.rand(64, 64)
-            b = np.random.rand(64, 64)
-            _ = np.matmul(a, x) + b
-            self.ops_count += 1
-            if not self.sleep_duration:
-                continue
-            t_start = time.time()
-            time.sleep(self.sleep_duration)
-            true_sleep_duration = time.time() - t_start
-            print(
-                "Hello from {} after slept {:.2f} s".format(self.name, true_sleep_duration))
+        start_time = time.perf_counter()
+        self.ops_count = count_ops(
+            job_duration=self.job_duration, array_s=self.array_s)
+        finish_time = time.perf_counter()
         if "-q" not in sys.argv:
             print(
                 "{} finished with {}k operations, about {:.3f}k operations per second".format(
-                    self.name, self.ops_count / 1000, (self.ops_count / 1000) / self.job_duration))
+                    self.name, self.ops_count / 1000,
+                    (self.ops_count / 1000) / (finish_time - start_time)))
 
 
 def main():
-    start_time = time.time()
+    start_time = time.perf_counter()
     n_jobs = 6
     job_duration = 1.
-    sleep_duration = 0.
 
     threads_list = []
 
     for _ in range(n_jobs):
         threads_list.append(
             HelloWorldMT(
-                job_duration=job_duration,
-                sleep_duration=sleep_duration))
+                job_duration=job_duration))
     for t in threads_list:
         t.start()
     for t in threads_list:
         t.join()
     ops_counts = [t.ops_count for t in threads_list]
-    finish_time = time.time()
+    finish_time = time.perf_counter()
     ops_count_total = sum(ops_counts)
     print(
         "Finished all jobs, totalling {}k operations, about {:.3f}k operations per second".format(

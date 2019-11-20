@@ -6,10 +6,10 @@ import aiohttp
 
 
 async def fetch(session: aiohttp.ClientSession, url: str):
-    start_time = time.time()
+    start_time = time.perf_counter()
     async with session.request("GET", url) as response:
         data = await response.read()
-        finish_time = time.time()
+        finish_time = time.perf_counter()
         # print(
         #     "Finished request {} in {:.2f} ms".format(
         #         url, (finish_time - start_time) * 1000
@@ -18,7 +18,7 @@ async def fetch(session: aiohttp.ClientSession, url: str):
 
 
 async def async_main():
-    start_time = time.time()
+    start_time = time.perf_counter()
     urls = [
         "http://localhost:5000/kittens2.webm",
         "http://localhost:5000/kittens.webm",
@@ -29,11 +29,11 @@ async def async_main():
         urls_data = await asyncio.gather(*futs)
         for data, url in zip(urls_data, urls):
             urls_data.append(data)
-            load_time = time.time()
+            load_time = time.perf_counter()
             # print(
             #     "Loaded {} ({:.2f} MB) in {:.2f} ms".format(
             #         url, len(data)/(1 << 20), (load_time - start_time) * 1000))
-        finish_time = time.time()
+        finish_time = time.perf_counter()
         print(
             "Finished all jobs in {:.2f} ms".format((finish_time - start_time) * 1000))
 
