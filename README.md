@@ -1,5 +1,4 @@
-# python-concurrency
-Choosing Concurrency and Parallelism for You Python Projects
+# Choosing Concurrency and Parallelism for You Python Projects
 
 By: Muhammad Shalahuddin Yahya Sunarko
 
