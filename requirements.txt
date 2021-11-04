@@ -1,0 +1,4 @@
+aiohttp>=3.0.0
+Flask>=1.0.0
+numpy>=1.18.0
+requests>=2.0.0
