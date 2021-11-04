@@ -1,5 +1,6 @@
 # Choosing Concurrency and Parallelism for Your Python Projects
-
+YouTube video:  
+[![YOUTUBE VIDEO](https://img.youtube.com/vi/HEg-uUdWIGo/0.jpg)](https://www.youtube.com/watch?v=HEg-uUdWIGo)
 
 ## Introduction
 > *Dealing with concurrency becomes hard when we lack the ‘working knowledge’ and best practices are not followed. ‒ Ramith Jayasinghe, Experienced Software Engineer.*
